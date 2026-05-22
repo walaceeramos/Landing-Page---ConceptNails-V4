@@ -290,7 +290,8 @@ if ('IntersectionObserver' in window) {
   revealItems.forEach((item) => item.classList.add('visible'));
 }
 
-// --- INTERATIVIDADE DE PERSPECTIVA 3D E PARALLAX POR MOUSE ---
+// --- INTERATIVIDADE DE PERSPECTIVA 3D E PARALLAX POR MOUSE (DESATIVADO PARA DEIXAR A IMAGEM TOTALMENTE FIXA) ---
+/*
 const heroVisual = document.querySelector('.hero-visual');
 const heroCard = document.querySelector('.hero-card-perspective');
 const heroOrganicShape = document.querySelector('.hero-organic-shape');
@@ -347,4 +348,5 @@ if (heroVisual && heroCard && heroOrganicShape && window.innerWidth > 820) {
     });
   });
 }
+*/
 
