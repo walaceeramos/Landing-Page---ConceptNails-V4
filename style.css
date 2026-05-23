@@ -1760,6 +1760,7 @@ h2,
 .pre-booking-card input[type="text"],
 .pre-booking-card input[type="tel"],
 .pre-booking-card input[type="number"],
+.pre-booking-card input[type="date"],
 .pre-booking-card select,
 .pre-booking-card textarea {
   width: 100%;
@@ -1771,6 +1772,19 @@ h2,
   padding: 0 16px;
   font-size: 0.95rem;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+/* Customização premium do ícone de calendário nativo */
+.pre-booking-card input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.95);
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.pre-booking-card input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .pre-booking-card textarea {
