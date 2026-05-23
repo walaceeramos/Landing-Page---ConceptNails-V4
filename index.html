@@ -31,9 +31,8 @@
       <nav class="nav" aria-label="Navegação principal">
         <a href="#servicos">Serviços</a>
         <a href="#trabalhos">Trabalhos</a>
-        <a href="#diferenciais">Diferenciais</a>
+        <a href="#cursos">Cursos</a>
         <a href="#depoimentos">Depoimentos</a>
-        <a href="#pre-atendimento">Pré-atendimento</a>
         <a href="#duvidas">Dúvidas</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -283,6 +282,81 @@
         <div class="center-cta">
           <a class="btn btn-dark" href="#pre-atendimento" data-service-help="true">
             Quero ajuda para escolher meu serviço
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="cursos" class="section courses-section">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Aprenda com a ConceptNails</span>
+          <h2>Além de transformar unhas, agora eu também ensino minha técnica.</h2>
+          <p>
+            Se você deseja começar na área ou aperfeiçoar suas técnicas, entre em contato para receber informações sobre os cursos da ConceptNails.
+          </p>
+        </div>
+
+        <div class="courses-grid">
+          <!-- Card 1 -->
+          <div class="course-benefit-card">
+            <div class="course-benefit-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h3>Iniciantes e profissionais</h3>
+            <p>Desenvolvido tanto para quem quer começar do zero absoluto quanto para profissionais que desejam aperfeiçoamento.</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="course-benefit-card">
+            <div class="course-benefit-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <h3>Técnicas atuais e premium</h3>
+            <p>Aprenda o método exato de alongamento, blindagem e nail art que gera alta fidelização de clientes.</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="course-benefit-card">
+            <div class="course-benefit-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3>Aprendizado prático</h3>
+            <p>Instruções claras e dinâmicas com acompanhamento focado na prática para garantir sua evolução real.</p>
+          </div>
+
+          <!-- Card 4 (Featured Destaque) -->
+          <div class="course-benefit-card featured-course">
+            <div class="course-benefit-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3>Lista de interesse aberta</h3>
+            <p>Vagas limitadas por turma para assegurar atenção individualizada. Inscreva-se para receber novidades em primeira mão.</p>
+          </div>
+        </div>
+
+        <div class="center-cta">
+          <a class="btn btn-yellow pulse-animation" target="_blank" rel="noopener noreferrer" href="https://wa.me/5564992385744?text=Oi!%20Tenho%20interesse%20nos%20cursos%20da%20ConceptNails%20e%20gostaria%20de%20receber%20mais%20informa%C3%A7%C3%B5es.">
+            Entrar na lista de interesse 💬
           </a>
         </div>
       </div>
@@ -549,13 +623,17 @@
 
                   <div class="form-row-2">
                     <div class="input-group">
-                      <label for="p_dia">Dia pretendido</label>
-                      <input type="text" id="p_dia" name="dia" placeholder="Ex: Sexta ou dia 15" />
+                      <label for="p_dia">Dia pretendido <span class="required-indicator">*</span></label>
+                      <input type="date" id="p_dia" name="dia" required />
+                      <span class="error-msg">Por favor, selecione uma data válida.</span>
                     </div>
 
                     <div class="input-group">
-                      <label for="p_horario">Horário pretendido</label>
-                      <input type="text" id="p_horario" name="horario" placeholder="Ex: 14h ou tarde" />
+                      <label for="p_horario">Horário pretendido <span class="required-indicator">*</span></label>
+                      <select id="p_horario" name="horario" required disabled>
+                        <option value="">Selecione o dia primeiro</option>
+                      </select>
+                      <span class="error-msg">Por favor, selecione um horário disponível.</span>
                     </div>
                   </div>
 
@@ -695,7 +773,7 @@
           <div class="visual-details">
             <div class="detail-item">
               <strong>Horários de Atendimento</strong>
-              <span>Terça a Sábado, das 08h às 18h</span>
+              <span>Segunda a Sábado, das 08h às 20h</span>
             </div>
             <div class="detail-item">
               <strong>Padrão de Biossegurança</strong>
@@ -776,6 +854,7 @@
         <h3>Links rápidos</h3>
         <a href="#servicos">Serviços</a>
         <a href="#trabalhos">Trabalhos</a>
+        <a href="#cursos">Cursos</a>
         <a href="#depoimentos">Depoimentos</a>
         <a href="#pre-atendimento">Pré-atendimento</a>
       </div>

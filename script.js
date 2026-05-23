@@ -43,6 +43,84 @@ if (preForm) {
     }
   });
 
+  // 1.5. Configurações de Agendamento Dinâmico (Google Calendar API)
+  const fieldDia = document.getElementById('p_dia');
+  const fieldServico = document.getElementById('p_servico');
+  const fieldHorario = document.getElementById('p_horario');
+
+  // Definir data mínima como hoje (Caldas Novas local date)
+  if (fieldDia) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    fieldDia.min = `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Função para buscar horários disponíveis no backend
+  async function fetchAvailableSlots() {
+    const dateVal = fieldDia.value;
+    const serviceVal = fieldServico.value;
+
+    if (!dateVal || !serviceVal) {
+      fieldHorario.innerHTML = '<option value="">Selecione o dia e serviço</option>';
+      fieldHorario.disabled = true;
+      return;
+    }
+
+    fieldHorario.innerHTML = '<option value="">Carregando horários...</option>';
+    fieldHorario.disabled = true;
+
+    try {
+      const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:5000' 
+        : '';
+      
+      const response = await fetch(`${baseUrl}/api/available-slots?date=${dateVal}&service=${encodeURIComponent(serviceVal)}`);
+      
+      if (!response.ok) {
+        throw new Error('Falha ao buscar horários.');
+      }
+
+      const data = await response.json();
+      
+      if (data.slots && data.slots.length > 0) {
+        let optionsHtml = '<option value="">Selecione um horário</option>';
+        let hasAvailable = false;
+
+        data.slots.forEach(slot => {
+          if (slot.available) {
+            optionsHtml += `<option value="${slot.time}">${slot.time}</option>`;
+            hasAvailable = true;
+          } else {
+            optionsHtml += `<option value="${slot.time}" disabled>${slot.time} (Ocupado)</option>`;
+          }
+        });
+
+        if (!hasAvailable) {
+          fieldHorario.innerHTML = '<option value="">Nenhum horário disponível para este dia</option>';
+          fieldHorario.disabled = true;
+        } else {
+          fieldHorario.innerHTML = optionsHtml;
+          fieldHorario.disabled = false;
+        }
+      } else {
+        fieldHorario.innerHTML = '<option value="">Nenhum horário disponível</option>';
+        fieldHorario.disabled = true;
+      }
+    } catch (error) {
+      console.error('Erro ao buscar slots:', error);
+      fieldHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
+      fieldHorario.disabled = true;
+    }
+  }
+
+  // Ouvir mudanças nos campos de data e serviço
+  if (fieldDia && fieldServico) {
+    fieldDia.addEventListener('change', fetchAvailableSlots);
+    fieldServico.addEventListener('change', fetchAvailableSlots);
+  }
+
   // 2. Máscara em tempo real para Telefone: (XX) XXXXX-XXXX
   fieldTelefone.addEventListener('input', (e) => {
     let value = e.target.value.replace(/\D/g, ''); // Apenas números
@@ -66,7 +144,7 @@ if (preForm) {
   });
 
   // 3. Validação e Submissão do Formulário
-  preForm.addEventListener('submit', (e) => {
+  preForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     let isValid = true;
@@ -76,6 +154,8 @@ if (preForm) {
     const servico = document.getElementById('p_servico');
     const checkboxes = preForm.querySelectorAll('.checkboxes-wrapper input[type="checkbox"]');
     const checkErrorMsg = document.getElementById('checkboxes-error');
+    const dia = document.getElementById('p_dia');
+    const horario = document.getElementById('p_horario');
 
     // Validar Nome Completo
     if (!nome.value.trim() || nome.value.trim().split(' ').length < 2) {
@@ -113,6 +193,22 @@ if (preForm) {
       clearError(servico);
     }
 
+    // Validar Dia
+    if (!dia.value) {
+      showError(dia);
+      isValid = false;
+    } else {
+      clearError(dia);
+    }
+
+    // Validar Horário
+    if (!horario.value) {
+      showError(horario);
+      isValid = false;
+    } else {
+      clearError(horario);
+    }
+
     // Validar todos os Checkboxes obrigatórios
     let allChecksChecked = true;
     checkboxes.forEach((cb) => {
@@ -128,9 +224,52 @@ if (preForm) {
       checkErrorMsg.style.display = 'none';
     }
 
-    // Se todos os campos forem válidos, exibe a tela de sucesso
+    // Se todos os campos forem válidos, fazemos o agendamento real no backend
     if (isValid) {
-      showSuccessState();
+      const submitBtn = preForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Agendando na agenda da Isa...';
+
+      const decoracao = document.getElementById('p_decoracao').value.trim();
+      const observacoes = document.getElementById('p_obs').value.trim();
+
+      try {
+        const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+          ? 'http://localhost:5000' 
+          : '';
+
+        const response = await fetch(`${baseUrl}/api/book`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nome: nome.value.trim(),
+            telefone: fieldTelefone.value.trim(),
+            servico: servico.value,
+            dia: dia.value,
+            horario: horario.value,
+            decoracao,
+            observacoes
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Erro ao agendar horário.');
+        }
+
+        // Sucesso! Mostrar tela de sucesso
+        showSuccessState(result.demo);
+      } catch (error) {
+        console.error('Erro de agendamento:', error);
+        alert(`❌ Não foi possível agendar:\n${error.message}\n\nPor favor, escolha outro horário ou dia.`);
+        // Recarregar os slots disponíveis
+        fetchAvailableSlots();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
     }
   });
 
@@ -174,19 +313,27 @@ function clearError(input) {
 }
 
 // 4. Mostrar Tela de Sucesso e gerar link estruturado do WhatsApp
-function showSuccessState() {
+function showSuccessState(isDemo = false) {
   const nome = document.getElementById('p_nome').value.trim();
   const telefone = document.getElementById('p_telefone').value.trim();
   const menor = document.getElementById('p_menor').value === 'sim' ? `Sim (Idade: ${document.getElementById('p_idade').value} anos)` : 'Não';
   const servico = document.getElementById('p_servico').value;
-  const dia = document.getElementById('p_dia').value.trim() || 'A combinar';
-  const horario = document.getElementById('p_horario').value.trim() || 'A combinar';
-  const decoracao = document.getElementById('p_decoracao').value.trim() || 'Nenhuma (ou a combinar)';
+  const dia = document.getElementById('p_dia').value;
+  const horario = document.getElementById('p_horario').value;
+  const decoracao = document.getElementById('p_decoracao').value.trim() || 'Nenhuma';
   const obs = document.getElementById('p_obs').value.trim() || 'Nenhuma';
+
+  // Formatar a data de YYYY-MM-DD para DD/MM/YYYY
+  let diaFormatado = dia;
+  if (dia && dia.includes('-')) {
+    const parts = dia.split('-');
+    diaFormatado = `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
 
   // Mensagem estruturada para o WhatsApp
   const msgLinhas = [
-    `Olá, ConceptNails! Quero confirmar meu agendamento. Aqui estão meus dados preenchidos:`,
+    `Olá, ConceptNails! Confirmei meu agendamento no site e já está agendado no Google Agenda. Aqui estão os dados:`,
+    isDemo ? `⚠️ [AGENDAMENTO DE TESTE - MODO DEMO]` : ``,
     ``,
     `📌 DADOS DA CLIENTE`,
     `• Nome: ${nome}`,
@@ -195,7 +342,7 @@ function showSuccessState() {
     ``,
     `💅 DETALHES DO PROCEDIMENTO`,
     `• Serviço: ${servico}`,
-    `• Dia pretendido: ${dia}`,
+    `• Dia pretendido: ${diaFormatado}`,
     `• Horário pretendido: ${horario}`,
     `• Decoração: ${decoracao}`,
     `• Observações/Referência: ${obs}`,
@@ -204,7 +351,8 @@ function showSuccessState() {
     `[x] Confirmo que preenchi os dados corretamente, li e estou 100% de acordo com as regras de agendamento, atrasos e política de sinal (50% não reembolsável em caso de ausência).`
   ];
 
-  const mensagemTexto = msgLinhas.join('\n');
+  // Remover linhas em branco extras se houver
+  const mensagemTexto = msgLinhas.filter(line => line !== null).join('\n');
   
   // Injetar resumo na visualização
   const previewBox = document.getElementById('whatsappMessagePreview');
@@ -247,6 +395,8 @@ if (serviceLinks.length > 0 && preForm) {
       if (selectElement && selectedService) {
         selectElement.value = selectedService;
         clearError(selectElement);
+        // Disparar evento de mudança para recarregar slots de horário se a data já estiver preenchida
+        selectElement.dispatchEvent(new Event('change'));
       }
     });
   });
@@ -264,7 +414,7 @@ if (serviceHelp && preForm) {
 
 // --- SCROLL REVEAL (INTERSECTION OBSERVER) ---
 const revealItems = document.querySelectorAll(
-  '.hero-copy, .hero-visual, .trust-item, .section-heading, .gallery-item, .service-card, .diff-card, .faq-card, .rules-container, .pre-booking-card, .booking-visual-card, .quick-card'
+  '.hero-copy, .hero-visual, .trust-item, .section-heading, .gallery-item, .service-card, .diff-card, .faq-card, .rules-container, .pre-booking-card, .booking-visual-card, .quick-card, .course-benefit-card'
 );
 
 revealItems.forEach((item) => item.classList.add('reveal'));
