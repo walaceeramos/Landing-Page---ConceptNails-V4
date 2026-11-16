@@ -1,0 +1,17 @@
+[build]
+  # Instala as dependências do backend e copia só os arquivos do site para dist/
+  command = "npm ci --prefix backend && rm -rf dist && mkdir dist && cp -r index.html script.js style.css assets dist/"
+  publish = "dist"
+  functions = "backend/netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
