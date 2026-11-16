@@ -72,18 +72,18 @@ if (preForm) {
     fieldHorario.disabled = true;
 
     try {
-      const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:5000' 
+      const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5000'
         : '';
-      
+
       const response = await fetch(`${baseUrl}/api/available-slots?date=${dateVal}&service=${encodeURIComponent(serviceVal)}`);
-      
+
       if (!response.ok) {
         throw new Error('Falha ao buscar horários.');
       }
 
       const data = await response.json();
-      
+
       if (data.slots && data.slots.length > 0) {
         let optionsHtml = '<option value="">Selecione um horário</option>';
         let hasAvailable = false;
@@ -146,7 +146,7 @@ if (preForm) {
   // 3. Validação e Submissão do Formulário
   preForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     let isValid = true;
 
     // Elementos principais do formulário
@@ -235,8 +235,8 @@ if (preForm) {
       const observacoes = document.getElementById('p_obs').value.trim();
 
       try {
-        const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-          ? 'http://localhost:5000' 
+        const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:5000'
           : '';
 
         const response = await fetch(`${baseUrl}/api/book`, {
@@ -279,7 +279,7 @@ if (preForm) {
     btnBack.addEventListener('click', () => {
       document.getElementById('formStepContent').style.display = 'block';
       document.getElementById('formSuccessContent').style.display = 'none';
-      
+
       // Scroll suave de volta para o topo do formulário
       preForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
@@ -353,7 +353,7 @@ function showSuccessState(isDemo = false) {
 
   // Remover linhas em branco extras se houver
   const mensagemTexto = msgLinhas.filter(line => line !== null).join('\n');
-  
+
   // Injetar resumo na visualização
   const previewBox = document.getElementById('whatsappMessagePreview');
   if (previewBox) {
@@ -391,7 +391,7 @@ if (serviceLinks.length > 0 && preForm) {
     link.addEventListener('click', () => {
       const selectedService = link.getAttribute('data-service');
       const selectElement = document.getElementById('p_servico');
-      
+
       if (selectElement && selectedService) {
         selectElement.value = selectedService;
         clearError(selectElement);
